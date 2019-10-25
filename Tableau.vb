@@ -9,12 +9,10 @@
     Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
         Dim inputtableau As String(,) = mymenu.GetConstraints
         TableHeight = inputtableau.GetLength(1) - 2
-        Dim xlimit As Integer = inputtableau.GetLength(0) - 1 'Generates the variables for the top row
+        Dim xlimit As Integer = inputtableau.GetLength(0) - 1
         artificials = 0
         Dim SecondObjectiveFunction As Boolean = False
         For y = 0 To TableHeight 'if two step is required
-
-
             If inputtableau(xlimit, y) = "G" Then 'greater than
                 artificials += 1
                 SecondObjectiveFunction = True
@@ -30,7 +28,7 @@
             End If
         Next
 
-        If SecondObjectiveFunction Then TopRow.Add("Q")
+        If SecondObjectiveFunction Then TopRow.Add("Q") 'Generates the variables for the top row
         TopRow.Add("P")
         TopRow.AddRange(mymenu.VariableNames())
         For i = 1 To TableHeight
@@ -115,7 +113,6 @@
             Mode = 2
         Else
             Mode = 1
-
         End If
     End Sub
 
@@ -124,6 +121,10 @@
         TableLength = simplextableau.GetLength(0) - 1
         TableHeight = simplextableau.GetLength(1) - 1
         TopRow = MyTopRow
+    End Sub
+
+    Public Sub New(thissubispurelyherebecauseihavetocallitinminimisationsimplex As Boolean)
+        'this is the most quality sub routine I have ever created
     End Sub
     Public Function GetMode() As Integer
         Return Mode

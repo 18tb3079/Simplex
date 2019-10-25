@@ -93,35 +93,35 @@ Module Module1
             Console.Clear()
             'Try
             OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow"}), "Select Mode", "Blank")(0)
-                If OptimisationProblem = 0 Then
-                    MyMenu = New SimplexMenu()
-                ElseIf OptimisationProblem = 1 Then
-                    MyMenu = New Matching()
-                ElseIf OptimisationProblem = 2 Then
-                    MyMenu = New Flow()
-                Else
-                    MyMenu = New SimplexMenu()
-                End If
+            If OptimisationProblem = 0 Then
+                MyMenu = New SimplexMenu()
+            ElseIf OptimisationProblem = 1 Then
+                MyMenu = New Matching()
+            ElseIf OptimisationProblem = 2 Then
+                MyMenu = New Flow()
+            Else
+                MyMenu = New SimplexMenu()
+            End If
 
-                Dim MyTableau As Tableau
-                Do Until choice >= ConsoleKey.D2
-                    If MyMenu.GetMode = 1 Then
-                        MyTableau = New OneStep(MyMenu)
-                    ElseIf MyMenu.GetMode = 2 Then
-                        MyTableau = New TwoStep(MyMenu)
-                    Else
-                        MyTableau = New OneStep(MyMenu)
-                    End If
-                    MyTableau.OutputConstraintsFromTableau()
-                    MyTableau.Simplex()
-                    Console.WriteLine(vbCrLf & "Please enter your next action") 'THIS CAN SO BE A MENU CHANGE IT TOM
-                    Console.WriteLine("1. Run the simplex algorithm again with these constraints")
-                    Console.WriteLine("2. Run the simplex algorithm again with different constraints")
-                    Console.WriteLine("3. Go back to the main menu")
-                    Console.WriteLine("4. Exit")
-                    choice = Console.ReadKey(True).Key
-                Loop
-                ' Catch ex As Exception
+            Dim MyTableau As Tableau
+            Do Until choice >= ConsoleKey.D2
+                If MyMenu.GetMode = 1 Then
+                    MyTableau = New OneStep(MyMenu)
+                ElseIf MyMenu.GetMode = 2 Then
+                    MyTableau = New TwoStep(MyMenu)
+                Else ' mode = 3
+                    MyTableau = New MinimiseStep(MyMenu)
+                End If
+                MyTableau.OutputConstraintsFromTableau()
+                MyTableau.Simplex()
+                Console.WriteLine(vbCrLf & "Please enter your next action")
+                Console.WriteLine("1. Run the simplex algorithm again with these constraints")
+                Console.WriteLine("2. Choose a different mode")
+                Console.WriteLine("3. Go back to the main menu")
+                Console.WriteLine("4. Exit")
+                choice = Console.ReadKey(True).Key
+            Loop
+            ' Catch ex As Exception
             'Console.Clear()
             'Console.WriteLine(ex.Message)
             'Console.WriteLine("Press enter to restart: ")

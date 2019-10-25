@@ -7,12 +7,15 @@
     Public Sub New()
         UserInputTable = Menu2(OneDMenu(New List(Of String)({"Enter the number of variables", "Enter the number of constraints"}), "Enter required values", "Integer"))
         Mode = 1
-        For y = 0 To UserInputTable.GetLength(1) - 2 'Selects the mode of the table (one step or two step)
+        For y = 1 To UserInputTable.GetLength(1) - 2 'Selects the mode of the table (one step or two step)
             If UserInputTable(UserInputTable.GetLength(0) - 1, y) = "L" Then
             Else
                 Mode = 2
             End If
         Next
+        If UserInputTable(UserInputTable.GetLength(0) - 1, 0) = "MIN" Then 'minisation
+            Mode = 3
+        End If
     End Sub
 
     Public Function GetConstraints() As String(,) Implements IMenu.GetConstraints
@@ -122,7 +125,8 @@
                 End If
             Next
         Next
-        For i = 0 To NoOfConstraints
+        Constraints(NoOfVariables + 1, 0) = "MAX"
+        For i = 1 To NoOfConstraints
             Constraints(NoOfVariables + 1, i) = "L"
         Next
 
@@ -208,6 +212,7 @@
                                 Next
                             Next
                         End If
+                        'ReDim Preserve Constraints(NoOfVariables + 1, NoOfConstraints)
                         Return Constraints
                     Else
                         Console.SetCursorPosition(xord * 9 + 11, yord) 'Moves cursor
@@ -271,6 +276,19 @@
                     Constraints(NoOfVariables + 1, yord) = "G"
                     Console.SetCursorPosition((NoOfVariables - 1) * 9 + 11, yord)
                     S(Constraints, NoOfVariables - 1, yord, NoOfVariables, NoOfConstraints)
+                Case ConsoleKey.M 'Switches MAX and MIN
+                    If Constraints(NoOfVariables + 1, 0) = "MAX" Then
+                        Constraints(NoOfVariables + 1, 0) = "MIN"
+                        Console.SetCursorPosition(0, 0)
+                        Console.Write("Minimise:  ")
+                        Console.SetCursorPosition(xord * 9 + 11, yord)
+                    Else
+                        Constraints(NoOfVariables + 1, 0) = "MAX"
+                        Console.SetCursorPosition(0, 0)
+                        Console.Write("Maximise:  ")
+                        Console.SetCursorPosition(xord * 9 + 11, yord)
+                    End If
+
                 Case Else
                     key = key - 48 'Converts key into a number
                     If Len(Constraints(xord, yord)) < 6 Then
