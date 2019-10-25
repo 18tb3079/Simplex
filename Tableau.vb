@@ -132,7 +132,7 @@
 
     Public MustOverride Sub Simplex()
 
-    Public Sub OutputConstraintsFromTableau()
+    Public Overridable Sub OutputConstraintsFromTableau()
         Dim DeletePlus As Boolean
         Console.WriteLine(vbCrLf)
         Console.WriteLine("Your Constrains are: " & vbCrLf)

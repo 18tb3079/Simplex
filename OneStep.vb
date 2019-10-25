@@ -1,8 +1,9 @@
 ﻿Public Class OneStep
     Inherits Tableau
-
-    Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
-        MyBase.New(mymenu)
+    Private mymenu As IMenu
+    Public Sub New(mymymenu As IMenu) 'This subprogram creates the simplex tableau
+        MyBase.New(mymymenu)
+        mymenu = mymymenu
     End Sub
 
     Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String))
@@ -41,6 +42,19 @@
         Console.Write("  ")
     End Sub
 
+    Private Sub MinimiseCompletedTable() 'This subprogram outputs the values but only if it is from a minimisation problem
+        Console.SetCursorPosition(0, Console.CursorTop - 1)
+        Console.WriteLine("Tableau is complete! Values for all the variables are shown below: ")
+        Dim variables As List(Of String) = mymenu.VariableNames
+        Dim count As Integer = variables.Count
+        Console.Write("P = " & Tableau(TableLength, 0) & " , ")
+        For i = 1 To count
+            Console.Write(variables(i - 1) & " = " & Tableau(TableLength - 1 - (count - i), 0) & " , ")
+        Next
+        Console.SetCursorPosition(Console.CursorLeft - 2, Console.CursorTop)
+        Console.Write("  ")
+    End Sub
+
     Public Overrides Sub Simplex() 'This subprogram executes the simplex algorithm
         Dim PivotColumn As Integer
         Dim TopOfPivotColumn As Integer
@@ -58,12 +72,16 @@
                 End If
             Next
             If PivotColumn = -1 Then
-                CompletedTable()
+                If mymenu.GetMode() <> 3 Then
+                    CompletedTable()
+                Else
+                    MinimiseCompletedTable()
+                End If
                 Return
             End If
 
-            'Ratio Test
-            PivotRow = -1
+                'Ratio Test
+                PivotRow = -1
             RatioTest = Integer.MaxValue
             For y = 1 To TableHeight
                 Try

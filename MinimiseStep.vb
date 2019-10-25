@@ -1,5 +1,7 @@
 ﻿Public Class MinimiseStep
     Inherits Tableau
+    Private MyNewMenu As IMenu
+    Private MyNewTableau As Tableau
     Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
         MyBase.New(True)
         'This class is different to the other two as it requires an intermidiate step before creating the simplex tableau
@@ -53,9 +55,14 @@
                 End If
             Next
         Next
-        Dim MyNewMenu As New MinimiseMenu(NewInputtableau, MatrixLength - 1)
+        MyNewMenu = New MinimiseMenu(NewInputtableau, MatrixLength)
+        MyNewTableau = New OneStep(MyNewMenu)
+    End Sub
+
+    Public Overrides Sub OutputConstraintsFromTableau()
+        Console.WriteLine("lmao havent coded this yet dab yeet")
     End Sub
     Public Overrides Sub Simplex()
-        Throw New NotImplementedException()
+        MyNewTableau.Simplex()
     End Sub
 End Class

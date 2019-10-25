@@ -89,7 +89,7 @@ Module Module1
         Dim MyMenu As IMenu
         Dim choice As ConsoleKey = 0
         Dim OptimisationProblem As Integer
-        Do Until choice >= ConsoleKey.D4
+        Do Until 
             Console.Clear()
             'Try
             OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow"}), "Select Mode", "Blank")(0)
@@ -104,7 +104,7 @@ Module Module1
             End If
 
             Dim MyTableau As Tableau
-            Do Until choice >= ConsoleKey.D2
+            Do
                 If MyMenu.GetMode = 1 Then
                     MyTableau = New OneStep(MyMenu)
                 ElseIf MyMenu.GetMode = 2 Then
@@ -119,15 +119,18 @@ Module Module1
                 Console.WriteLine("2. Choose a different mode")
                 Console.WriteLine("3. Go back to the main menu")
                 Console.WriteLine("4. Exit")
+                While Console.KeyAvailable
+                    choice = Console.ReadKey(True).Key
+                End While
                 choice = Console.ReadKey(True).Key
-            Loop
+            Loop Until choice >= ConsoleKey.D2
             ' Catch ex As Exception
             'Console.Clear()
             'Console.WriteLine(ex.Message)
             'Console.WriteLine("Press enter to restart: ")
             'Console.ReadLine()
             'End Try
-        Loop
+        Loop choice >= ConsoleKey.D4
     End Sub
 
 End Module
