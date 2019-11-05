@@ -4,8 +4,9 @@
     Private MyNewTableau As Tableau
     Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
         MyBase.New(True)
+        menu = mymenu
         'This class is different to the other two as it requires an intermidiate step before creating the simplex tableau
-        Dim inputtableau As String(,) = mymenu.GetConstraints
+        Dim inputtableau As String(,) = menu.GetConstraints
         Dim MatrixLength As Integer = inputtableau.GetLength(0) - 2
         Dim MatrixHeight As Integer = inputtableau.GetLength(1) - 2
         Dim Equalto As Integer = 0
@@ -18,13 +19,13 @@
         For y = 0 To MatrixHeight
             For x = 0 To MatrixLength
                 If y = 0 Then
-                    Matrix(x, MatrixHeight) = inputtableau(x, y)
+                    Matrix(x, MatrixHeight + Equalto) = inputtableau(x, y)
                 Else
                     If inputtableau(MatrixLength + 1, y) = "L" Then
                         Matrix(x, y - 1) = -1 * inputtableau(x, y)
                     ElseIf inputtableau(MatrixLength + 1, y) = "E" Then
                         Matrix(x, y - 1) = -1 * inputtableau(x, y)
-                        Matrix(x, MatrixHeight - Equalto) = inputtableau(x, y)
+                        Matrix(x, MatrixHeight + Equalto - 1) = inputtableau(x, y)
                         If x = MatrixLength Then Equalto -= 1
                     Else
                         Matrix(x, y - 1) = inputtableau(x, y)
@@ -33,13 +34,19 @@
             Next
         Next
 
+
+
         Dim TMatrixLength As Integer = Matrix.GetLength(1) - 1
-        Dim TMatrix(TMatrixLength, MatrixLength) As Double 'Transpose
-        For y = 0 To MatrixLength
+        DisplayMatrix(Matrix, MatrixLength, TMatrixLength)
+
+        Dim TMatrix(TMatrixLength, MatrixLength) As Double
+        For y = 0 To MatrixLength 'Transpose
             For x = 0 To TMatrixLength
                 TMatrix(x, y) = Matrix(y, x)
             Next
         Next
+
+        DisplayMatrix(TMatrix, TMatrixLength, MatrixLength)
 
         Dim NewInputtableau(TMatrixLength + 1, MatrixLength + 1) As String 'Formatting matrix into a one step array
         For y = 0 To MatrixLength
@@ -55,14 +62,32 @@
                 End If
             Next
         Next
-        MyNewMenu = New MinimiseMenu(NewInputtableau, MatrixLength)
+        Console.ReadKey()
+        MyNewMenu = New MinimiseMenu(NewInputtableau, TMatrixLength)
         MyNewTableau = New OneStep(MyNewMenu)
+    End Sub
+
+    Public Sub DisplayMatrix(matrix As Double(,), length As Integer, height As Integer)
+        Console.WriteLine()
+        For y = 0 To height
+            Console.Write("[ ")
+            For x = 0 To length
+                Console.Write(matrix(x, y) & " ")
+            Next
+            Console.WriteLine("]")
+        Next
+
     End Sub
 
     Public Overrides Sub OutputConstraintsFromTableau()
         Console.WriteLine("lmao havent coded this yet dab yeet")
     End Sub
-    Public Overrides Sub Simplex()
-        MyNewTableau.Simplex()
-    End Sub
+    Public Overrides Function Simplex()
+        Dim values As List(Of Double) = MyNewTableau.Simplex()
+        Dim variables As List(Of String) = menu.VariableNames()
+        For i = 0 To values.Count - 1
+            Console.Write(variables(i) & "=" & values(values.Count - i - 1) & " , ")
+        Next
+        Return Nothing
+    End Function
 End Class

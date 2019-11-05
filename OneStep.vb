@@ -1,13 +1,11 @@
 ﻿Public Class OneStep
     Inherits Tableau
-    Private mymenu As IMenu
-    Public Sub New(mymymenu As IMenu) 'This subprogram creates the simplex tableau
-        MyBase.New(mymymenu)
-        mymenu = mymymenu
+    Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
+        MyBase.New(mymenu)
     End Sub
 
-    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String))
-        MyBase.New(simplextableau, MyTopRow)
+    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String), mymenu As IMenu)
+        MyBase.New(simplextableau, MyTopRow, mymenu)
     End Sub
 
     Private Sub CompletedTable() 'This subprogram interprets the table to output the values for the variables
@@ -42,62 +40,64 @@
         Console.Write("  ")
     End Sub
 
-    Private Sub MinimiseCompletedTable() 'This subprogram outputs the values but only if it is from a minimisation problem
+    Private Function MinimiseCompletedTable() 'This subprogram outputs the values but only if it is from a minimisation problem
         Console.SetCursorPosition(0, Console.CursorTop - 1)
         Console.WriteLine("Tableau is complete! Values for all the variables are shown below: ")
-        Dim variables As List(Of String) = mymenu.VariableNames
-        Dim count As Integer = variables.Count
+        Dim values As New List(Of Double)
         Console.Write("P = " & Tableau(TableLength, 0) & " , ")
-        For i = 1 To count
-            Console.Write(variables(i - 1) & " = " & Tableau(TableLength - 1 - (count - i), 0) & " , ")
+        For i = 1 To TableHeight
+            values.Add(Tableau(TableLength - i, 0))
         Next
-        Console.SetCursorPosition(Console.CursorLeft - 2, Console.CursorTop)
-        Console.Write("  ")
-    End Sub
+        Return values
+    End Function
 
-    Public Overrides Sub Simplex() 'This subprogram executes the simplex algorithm
+    Public Overrides Function Simplex() 'This subprogram executes the simplex algorithm
         Dim PivotColumn As Integer
         Dim TopOfPivotColumn As Integer
         Dim PivotRow As Integer
         Dim RatioTest As Integer
+        Dim BannedColumns As New List(Of Integer)
         'Check for negative values and pivot column
         Do
+            BannedColumns.Clear()
             Display()
-            PivotColumn = -1
-            TopOfPivotColumn = 0
-            For x = 1 To TableLength
-                If Tableau(x, 0) < TopOfPivotColumn Then
-                    TopOfPivotColumn = Tableau(x, 0)
-                    PivotColumn = x
+            Do
+                PivotColumn = -1
+                TopOfPivotColumn = 0
+                For x = 1 To TableLength
+                    If Tableau(x, 0) < TopOfPivotColumn And BannedColumns.Contains(x) = False Then
+                        TopOfPivotColumn = Tableau(x, 0)
+                        PivotColumn = x
+                    End If
+                Next
+                If PivotColumn = -1 Then
+                    If menu.GetMode() <> 3 Then
+                        CompletedTable()
+                        Return Nothing
+                    Else
+                        Return MinimiseCompletedTable()
+                    End If
                 End If
-            Next
-            If PivotColumn = -1 Then
-                If mymenu.GetMode() <> 3 Then
-                    CompletedTable()
-                Else
-                    MinimiseCompletedTable()
-                End If
-                Return
-            End If
 
                 'Ratio Test
                 PivotRow = -1
-            RatioTest = Integer.MaxValue
-            For y = 1 To TableHeight
-                Try
-                    If Tableau(TableLength, y) / Tableau(PivotColumn, y) < RatioTest And Tableau(TableLength, y) / Tableau(PivotColumn, y) >= 0 Then
-                        If Tableau(PivotColumn, y) > 0 Or Tableau(TableLength, y) <> 0 Then
-                            PivotRow = y
-                            RatioTest = Tableau(TableLength, y) / Tableau(PivotColumn, y)
+                RatioTest = Integer.MaxValue
+                For y = 1 To TableHeight
+                    Try
+                        If Tableau(TableLength, y) / Tableau(PivotColumn, y) < RatioTest And Tableau(TableLength, y) / Tableau(PivotColumn, y) >= 0 Then
+                            If Tableau(PivotColumn, y) > 0 Or Tableau(TableLength, y) <> 0 Then
+                                PivotRow = y
+                                RatioTest = Tableau(TableLength, y) / Tableau(PivotColumn, y)
+                            End If
                         End If
-                    End If
-                Catch
-                End Try
-            Next
+                    Catch
+                    End Try
+                Next
 
-            If PivotRow = -1 Then
-                Throw New Exception("We should go onto the next variable now but the program doesnt do this yet")
-            End If
+                If PivotRow = -1 Then 'move onto next variable
+                    BannedColumns.Add(PivotColumn)
+                End If
+            Loop Until PivotRow <> -1
 
             'Making Pivot Value 1
             For x = 1 To TableLength
@@ -119,5 +119,5 @@
                 End If
             Next
         Loop
-    End Sub
+    End Function
 End Class

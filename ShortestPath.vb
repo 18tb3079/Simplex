@@ -1,4 +1,6 @@
-﻿Public Class Flow
+﻿Imports NEA
+
+Public Class ShortestPath
     Implements IMenu
     Private NoOfNodes As Integer
     Private UserInputTable As String(,)
@@ -18,43 +20,43 @@
         Dim NoOfEdges As Integer = Edges.Count - 1
 
         Dim TableLength As Integer = NoOfEdges + 2
-        Dim TableHeight As Integer = NoOfNodes + NoOfEdges
+        Dim TableHeight As Integer = NoOfNodes + NoOfEdges + 2
         ReDim UserInputTable(TableLength, TableHeight)
         For y = 0 To TableHeight
             For x = 0 To TableLength
-                If x = TableLength Then
+                If x = TableLength Then 'end of the table
                     If y = 0 Then
                         UserInputTable(x, y) = "L"
-                    ElseIf y <= NoOfNodes - 1 Then 'Less than, equal to or greater than
+                    ElseIf y < NoOfNodes + 2 Then 'Less than, equal to or greater than
                         UserInputTable(x, y) = "E"
                     Else
                         UserInputTable(x, y) = "L"
                     End If
-                ElseIf x = TableLength - 1 Then 'Value column
-                    If y <= NoOfNodes - 1 Then
+                ElseIf x = TableLength - 1 Then
+                    If y = 1 Or y >= NoOfNodes Then
+                        UserInputTable(x, y) = 1
+                    Else
                         UserInputTable(x, y) = 0
-                    Else ' Capacties
-                        Do
-                            NextEdgeCount += 1
-                        Loop Until ExistingConnections(NextEdgeCount) <> 0
-                        UserInputTable(x, y) = ExistingConnections(NextEdgeCount)
                     End If
                 ElseIf y = 0 Then 'objective function
-                    If Left(Edges(x), 1) = "S" Then
+                    Do
+                        NextEdgeCount += 1
+                    Loop Until ExistingConnections(NextEdgeCount) <> 0
+                    UserInputTable(x, y) = ExistingConnections(NextEdgeCount)
+                ElseIf y < NoOfEdges + 2 Then
+                    If Left(Edges(x), 1) = NtoL(y - 1) Then
                         UserInputTable(x, y) = 1
+                    ElseIf Right(Edges(x), 1) = NtoL(y - 1) Then
+                        If NtoL(y - 1) <> "T" Then
+                            UserInputTable(x, y) = -1
+                        Else
+                            UserInputTable(x, y) = 1
+                        End If
                     Else
                         UserInputTable(x, y) = 0
                     End If
-                ElseIf y < NoOfNodes Then 'Flow in = Flow out for each vertex
-                    If Left(Edges(x), 1) = Chr(y + 64) Then
-                        UserInputTable(x, y) = 1
-                    ElseIf Right(Edges(x), 1) = Chr(y + 64) Then
-                        UserInputTable(x, y) = -1
-                    Else
-                        UserInputTable(x, y) = 0
-                    End If
-                Else 'capacities
-                    If x = y - NoOfNodes Then
+                Else 'variables can either hold 1 or zero
+                    If x = y - NoOfNodes - 2 Then
                         UserInputTable(x, y) = 1
                     Else
                         UserInputTable(x, y) = 0
@@ -63,10 +65,11 @@
             Next
         Next
         ReDim Preserve UserInputTable(TableLength, TableHeight + 1) 'This is to match the formatting of the tableau class
-    End Sub
 
+
+    End Sub
     Public Function GetMode() As Integer Implements IMenu.GetMode
-        Return 2
+        Return 3
     End Function
 
     Public Function GetConstraints() As String(,) Implements IMenu.GetConstraints

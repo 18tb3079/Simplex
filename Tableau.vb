@@ -4,10 +4,12 @@
     Protected TableLength As Integer
     Protected TableHeight As Integer
     Protected artificials As Integer 'number of artificial variables
+    Protected menu As IMenu
     Private Mode As Integer ' 1 = onestep, 2 = two step, 3 = minimalisation
 
     Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
-        Dim inputtableau As String(,) = mymenu.GetConstraints
+        menu = mymenu
+        Dim inputtableau As String(,) = menu.GetConstraints
         TableHeight = inputtableau.GetLength(1) - 2
         Dim xlimit As Integer = inputtableau.GetLength(0) - 1
         artificials = 0
@@ -30,7 +32,7 @@
 
         If SecondObjectiveFunction Then TopRow.Add("Q") 'Generates the variables for the top row
         TopRow.Add("P")
-        TopRow.AddRange(mymenu.VariableNames())
+        TopRow.AddRange(menu.VariableNames())
         For i = 1 To TableHeight
             TopRow.Add("s" & i)
         Next
@@ -74,27 +76,27 @@
                         End If
                     End If
                 ElseIf Mid(TopRow(x), 1, 1) <> "s" And Mid(TopRow(x), 1, 1) <> "a" Then 'not a slack variable or an artificial variable
-                        If SecondObjectiveFunction Then
-                            Tableau(x, y) = inputtableau(x - 2, y) * Negative
-                        Else
-                            Tableau(x, y) = inputtableau(x - 1, y) * Negative
+                    If SecondObjectiveFunction Then
+                        Tableau(x, y) = inputtableau(x - 2, y) * Negative
+                    Else
+                        Tableau(x, y) = inputtableau(x - 1, y) * Negative
+                    End If
+                    If inputtableau(xlimit, y) <> "L" Then
+                        Tableau(x, TableHeight) = Tableau(x, y) + Tableau(x, TableHeight)
+                    End If
+                ElseIf Mid(TopRow(x), 2, 1) = SlackNo And Mid(TopRow(x), 1, 1) = "s" Then 'adding slack
+                    If Not addedslack Then
+                        addedslack = True
+                        If inputtableau(xlimit, y) = "L" Then
+                            Tableau(x, y) = 1
+                        Else 'if constraint is artificial then it needs a surplus variable instead
+                            Tableau(x, y) = -1
+                            Tableau(x, TableHeight) = Tableau(x, TableHeight) - 1
                         End If
-                        If inputtableau(xlimit, y) <> "L" Then
-                            Tableau(x, TableHeight) = Tableau(x, y) + Tableau(x, TableHeight)
-                        End If
-                    ElseIf Mid(TopRow(x), 2, 1) = SlackNo And Mid(TopRow(x), 1, 1) = "s" Then 'adding slack
-                        If Not addedslack Then
-                            addedslack = True
-                            If inputtableau(xlimit, y) = "L" Then
-                                Tableau(x, y) = 1
-                            Else 'if constraint is artificial then it needs a surplus variable instead
-                                Tableau(x, y) = -1
-                                Tableau(x, TableHeight) = Tableau(x, TableHeight) - 1
-                            End If
-                            SlackNo += 1
-                        End If
-                    ElseIf Mid(TopRow(x), 2, 1) = ArtifNo And Mid(TopRow(x), 1, 1) = "a" Then 'adding artificial variables
-                        If Not addedarti Then
+                        SlackNo += 1
+                    End If
+                ElseIf Mid(TopRow(x), 2, 1) = ArtifNo And Mid(TopRow(x), 1, 1) = "a" Then 'adding artificial variables
+                    If Not addedarti Then
                         addedarti = True
                         If inputtableau(xlimit, y) <> "L" Then
                             Tableau(x, y) = 1
@@ -116,7 +118,8 @@
         End If
     End Sub
 
-    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String)) 'We need this so we can convert a two step tableau into a one step tableau
+    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String), mymenu As IMenu) 'We need this so we can convert a two step tableau into a one step tableau
+        menu = mymenu
         Tableau = simplextableau
         TableLength = simplextableau.GetLength(0) - 1
         TableHeight = simplextableau.GetLength(1) - 1
@@ -130,7 +133,7 @@
         Return Mode
     End Function
 
-    Public MustOverride Sub Simplex()
+    Public MustOverride Function Simplex()
 
     Public Overridable Sub OutputConstraintsFromTableau()
         Dim DeletePlus As Boolean

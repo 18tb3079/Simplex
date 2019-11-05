@@ -89,16 +89,18 @@ Module Module1
         Dim MyMenu As IMenu
         Dim choice As ConsoleKey = 0
         Dim OptimisationProblem As Integer
-        Do Until 
+        Do Until choice >= ConsoleKey.D4
             Console.Clear()
             'Try
-            OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow"}), "Select Mode", "Blank")(0)
+            OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path"}), "Select Mode", "Blank")(0)
             If OptimisationProblem = 0 Then
                 MyMenu = New SimplexMenu()
             ElseIf OptimisationProblem = 1 Then
                 MyMenu = New Matching()
             ElseIf OptimisationProblem = 2 Then
                 MyMenu = New Flow()
+            ElseIf OptimisationProblem = 3 Then
+                MyMenu = New ShortestPath()
             Else
                 MyMenu = New SimplexMenu()
             End If
@@ -129,8 +131,8 @@ Module Module1
             'Console.WriteLine(ex.Message)
             'Console.WriteLine("Press enter to restart: ")
             'Console.ReadLine()
-            'End Try
-        Loop choice >= ConsoleKey.D4
+            'End Try                                                                                                                                                                                                                                                                 
+        Loop
     End Sub
 
 End Module
