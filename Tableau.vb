@@ -6,8 +6,10 @@
     Protected artificials As Integer 'number of artificial variables
     Protected menu As IMenu
     Private Mode As Integer ' 1 = onestep, 2 = two step, 3 = minimalisation
+    Protected DisplayMode As Integer = 0
 
-    Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
+    Public Sub New(mymenu As IMenu, mydisplay As Integer) 'This subprogram creates the simplex tableau
+        DisplayMode = mydisplay
         menu = mymenu
         Dim inputtableau As String(,) = menu.GetConstraints
         TableHeight = inputtableau.GetLength(1) - 2
@@ -118,7 +120,8 @@
         End If
     End Sub
 
-    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String), mymenu As IMenu) 'We need this so we can convert a two step tableau into a one step tableau
+    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String), mymenu As IMenu, mydisplay As Integer) 'We need this so we can convert a two step tableau into a one step tableau
+        DisplayMode = mydisplay
         menu = mymenu
         Tableau = simplextableau
         TableLength = simplextableau.GetLength(0) - 1
@@ -126,8 +129,8 @@
         TopRow = MyTopRow
     End Sub
 
-    Public Sub New(thissubispurelyherebecauseihavetocallitinminimisationsimplex As Boolean)
-        'this is the most quality sub routine I have ever created
+    Public Sub New(mydisplay As Integer)
+        DisplayMode = mydisplay
     End Sub
     Public Function GetMode() As Integer
         Return Mode
@@ -167,32 +170,34 @@
         Console.ReadLine()
     End Sub
 
-    Public Sub Display() 'This subprogram displays the tableau
-        Console.Clear()
-        For x = 0 To TableLength
-            For i = 6 To Len(TopRow(x)) Step -1 'spacing
-                Console.Write(" ")
-            Next
-            Console.Write(TopRow(x))
-            Console.Write("|")
-        Next
-        Console.WriteLine()
-        For y = 0 To TableHeight
+    Public Sub Display(pivotcolumn As Integer, pivotrow As Integer) 'This subprogram displays the tableau
+        If DisplayMode <> 2 Or pivotcolumn = -2 Then
+            Console.Clear()
             For x = 0 To TableLength
-                If Len(CStr(Tableau(x, y))) > 7 Then 'more spacing
-                    Console.Write(Mid(Tableau(x, y), 1, 7))
-                Else
-                    For i = 6 To Len(CStr(Tableau(x, y))) Step -1
-                        Console.Write(" ")
-                    Next
-                    Console.Write(Tableau(x, y))
-                End If
+                For i = 6 To Len(TopRow(x)) Step -1 'spacing
+                    Console.Write(" ")
+                Next
+                Console.Write(TopRow(x))
                 Console.Write("|")
             Next
             Console.WriteLine()
-        Next
-        Console.Write("Press enter to continue: ")
-        Console.ReadLine()
+            For y = 0 To TableHeight
+                For x = 0 To TableLength
+                    If Len(CStr(Tableau(x, y))) > 7 Then 'more spacing
+                        Console.Write(Mid(Tableau(x, y), 1, 7))
+                    Else
+                        For i = 6 To Len(CStr(Tableau(x, y))) Step -1
+                            Console.Write(" ")
+                        Next
+                        Console.Write(Tableau(x, y))
+                    End If
+                    Console.Write("|")
+                Next
+                Console.WriteLine()
+            Next
+            Console.Write("Press enter to continue: ")
+            Console.ReadLine()
+        End If
     End Sub
 
 End Class

@@ -93,7 +93,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="OneStep.vb" />
+    <Compile Include="Stack.vb" />
     <Compile Include="Tableau.vb" />
+    <Compile Include="Tree.vb" />
     <Compile Include="TwoStep.vb" />
   </ItemGroup>
   <ItemGroup>

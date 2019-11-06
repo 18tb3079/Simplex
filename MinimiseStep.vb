@@ -2,8 +2,8 @@
     Inherits Tableau
     Private MyNewMenu As IMenu
     Private MyNewTableau As Tableau
-    Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
-        MyBase.New(True)
+    Public Sub New(mymenu As IMenu, mydisplay As Integer) 'This subprogram creates the simplex tableau
+        MyBase.New(mydisplay)
         menu = mymenu
         'This class is different to the other two as it requires an intermidiate step before creating the simplex tableau
         Dim inputtableau As String(,) = menu.GetConstraints
@@ -37,6 +37,10 @@
 
 
         Dim TMatrixLength As Integer = Matrix.GetLength(1) - 1
+        Console.WriteLine()
+        For i = 0 To menu.VariableNames.Count - 1
+            Console.Write(menu.VariableNames(i) & " ")
+        Next
         DisplayMatrix(Matrix, MatrixLength, TMatrixLength)
 
         Dim TMatrix(TMatrixLength, MatrixLength) As Double
@@ -45,6 +49,7 @@
                 TMatrix(x, y) = Matrix(y, x)
             Next
         Next
+
 
         DisplayMatrix(TMatrix, TMatrixLength, MatrixLength)
 
@@ -64,7 +69,7 @@
         Next
         Console.ReadKey()
         MyNewMenu = New MinimiseMenu(NewInputtableau, TMatrixLength)
-        MyNewTableau = New OneStep(MyNewMenu)
+        MyNewTableau = New OneStep(MyNewMenu, mydisplay)
     End Sub
 
     Public Sub DisplayMatrix(matrix As Double(,), length As Integer, height As Integer)

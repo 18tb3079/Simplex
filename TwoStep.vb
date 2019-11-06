@@ -5,18 +5,18 @@
     'x >= 1
     ' x + y <= 2
 
-    Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
-        MyBase.New(mymenu)
+    Public Sub New(mymenu As IMenu, mydisplay As Integer) 'This subprogram creates the simplex tableau
+        MyBase.New(mymenu, mydisplay)
     End Sub
     Public Overrides Function Simplex()
-        Dim PivotColumn As Integer
+        Dim PivotColumn As Integer = -1
         Dim BottomOfPivotColumn As Integer
-        Dim PivotRow As Integer
+        Dim PivotRow As Integer = -1
         Dim RatioTest As Integer
         Dim BannedColumns As New List(Of Integer)
         Do
             'Find the biggest value in the second objective function (if it is zero then end)
-            Display()
+            Display(PivotColumn, PivotColumn)
             BannedColumns.Clear()
             Do
                 PivotColumn = -1
@@ -46,7 +46,7 @@
                         Next
                     Next
 
-                    Dim MyOneStepTableau As New OneStep(ReducedTableau, ReducedTopRow, menu)
+                    Dim MyOneStepTableau As New OneStep(ReducedTableau, ReducedTopRow, menu, DisplayMode)
                     MyOneStepTableau.Simplex()
                     Return Nothing
                 End If

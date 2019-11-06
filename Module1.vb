@@ -85,34 +85,41 @@ Module Module1
     End Function
 
     Sub Main()
+        Console.WriteLine("PLEASE GO FULLSCREEN (press enter to continue)")
+        Console.ReadLine()
         Console.CursorVisible = False
         Dim MyMenu As IMenu
         Dim choice As ConsoleKey = 0
         Dim OptimisationProblem As Integer
+        Dim displaymode As Integer = 0
         Do Until choice >= ConsoleKey.D4
             Console.Clear()
             'Try
-            OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path"}), "Select Mode", "Blank")(0)
-            If OptimisationProblem = 0 Then
-                MyMenu = New SimplexMenu()
-            ElseIf OptimisationProblem = 1 Then
-                MyMenu = New Matching()
-            ElseIf OptimisationProblem = 2 Then
-                MyMenu = New Flow()
-            ElseIf OptimisationProblem = 3 Then
-                MyMenu = New ShortestPath()
-            Else
-                MyMenu = New SimplexMenu()
-            End If
+            Do
+                OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path", "Settings"}), "Select Mode", "Blank")(0)
+                If OptimisationProblem = 0 Then
+                    MyMenu = New SimplexMenu()
+                ElseIf OptimisationProblem = 1 Then
+                    MyMenu = New Matching()
+                ElseIf OptimisationProblem = 2 Then
+                    MyMenu = New Flow()
+                ElseIf OptimisationProblem = 3 Then
+                    MyMenu = New ShortestPath()
+                ElseIf OptimisationProblem = 4 Then 'Settings
+                    displaymode = OneDMenu(New List(Of String)({"Display each iteration", "Display each step", "Display only the completed tableau"}), "Select Display Mode", "Blank")(0)
+                Else
+                    MyMenu = New SimplexMenu()
+                End If
+            Loop Until OptimisationProblem <> 4
 
             Dim MyTableau As Tableau
             Do
                 If MyMenu.GetMode = 1 Then
-                    MyTableau = New OneStep(MyMenu)
+                    MyTableau = New OneStep(MyMenu, displaymode)
                 ElseIf MyMenu.GetMode = 2 Then
-                    MyTableau = New TwoStep(MyMenu)
+                    MyTableau = New TwoStep(MyMenu, displaymode)
                 Else ' mode = 3
-                    MyTableau = New MinimiseStep(MyMenu)
+                    MyTableau = New MinimiseStep(MyMenu, displaymode)
                 End If
                 MyTableau.OutputConstraintsFromTableau()
                 MyTableau.Simplex()

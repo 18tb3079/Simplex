@@ -1,14 +1,15 @@
 ﻿Public Class OneStep
     Inherits Tableau
-    Public Sub New(mymenu As IMenu) 'This subprogram creates the simplex tableau
-        MyBase.New(mymenu)
+    Public Sub New(mymenu As IMenu, mydisplay As Integer) 'This subprogram creates the simplex tableau
+        MyBase.New(mymenu, mydisplay)
     End Sub
 
-    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String), mymenu As IMenu)
-        MyBase.New(simplextableau, MyTopRow, mymenu)
+    Public Sub New(simplextableau As Double(,), MyTopRow As List(Of String), mymenu As IMenu, mydisplay As Integer)
+        MyBase.New(simplextableau, MyTopRow, mymenu, mydisplay)
     End Sub
 
     Private Sub CompletedTable() 'This subprogram interprets the table to output the values for the variables
+        If DisplayMode = 2 Then Display(-2, -2)
         Console.SetCursorPosition(0, Console.CursorTop - 1)
         Console.WriteLine("Tableau is complete! Values for all the variables are shown below: ")
         Dim basicvariabletest As Double
@@ -52,15 +53,15 @@
     End Function
 
     Public Overrides Function Simplex() 'This subprogram executes the simplex algorithm
-        Dim PivotColumn As Integer
+        Dim PivotColumn As Integer = -1
         Dim TopOfPivotColumn As Integer
-        Dim PivotRow As Integer
+        Dim PivotRow As Integer = -1
         Dim RatioTest As Integer
         Dim BannedColumns As New List(Of Integer)
         'Check for negative values and pivot column
         Do
             BannedColumns.Clear()
-            Display()
+            Display(PivotColumn, PivotRow)
             Do
                 PivotColumn = -1
                 TopOfPivotColumn = 0
