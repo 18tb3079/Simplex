@@ -96,7 +96,7 @@ Module Module1
             Console.Clear()
             'Try
             Do
-                OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path", "Settings"}), "Select Mode", "Blank")(0)
+                OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path", "Minimum Spanning Tree", "Settings"}), "Select Mode", "Blank")(0)
                 If OptimisationProblem = 0 Then
                     MyMenu = New SimplexMenu()
                 ElseIf OptimisationProblem = 1 Then
@@ -105,7 +105,9 @@ Module Module1
                     MyMenu = New Flow()
                 ElseIf OptimisationProblem = 3 Then
                     MyMenu = New ShortestPath()
-                ElseIf OptimisationProblem = 4 Then 'Settings
+                ElseIf OptimisationProblem = 4 Then
+                    MyMenu = New Tree()
+                ElseIf OptimisationProblem = 5 Then 'Settings
                     displaymode = OneDMenu(New List(Of String)({"Display each iteration", "Display each step", "Display only the completed tableau"}), "Select Display Mode", "Blank")(0)
                 Else
                     MyMenu = New SimplexMenu()
