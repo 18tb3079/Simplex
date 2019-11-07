@@ -20,46 +20,77 @@ Public Class Tree
         ExistingConnections = OneDMenu(VariableNames, "Enter the weights of these edges (Enter 0 if they do not exist)", "Integer") 'Gets the arc weights of the graph
         Edges = VariableNames()
         NoOfEdges = Edges.Count - 1
-        CycleChecker()
-    End Sub
-
-    'Private Function RecursiveCombinatorics(ListOfNodes As List(Of String), Cycles As List(Of String), count As Integer)
-    '    Dim CurrentLetter As String = ListOfNodes(ListOfNodes.Count - count)
-    '    count -= 1
-    '    If count = 0 Then
-    '        Cycles.Add(CurrentLetter)
-    '        Return Cycles
-    '    Else
-    '        Cycles = RecursiveCombinatorics(ListOfNodes, Cycles, count)
-    '        Dim NewCycles As New List(Of String)
-    '        For Each element In Cycles
-    '            For i = 0 To Len(element)
-    '                NewCycles.Add(Left(element, i) & CurrentLetter & Right(element, Len(element) - i))
-    '            Next
-    '            NewCycles.Add(element)
-    '        Next
-    '        Return NewCycles
-    '    End If
-
-    'End Function
-
-    Private Sub CycleChecker() 'I need to find all the cycles in the graph
-        Dim NodeStack As New Stack()
-        Dim Cycles As New List(Of String)
-        Dim ListOfNodes As New List(Of String)
-
-        For i = 0 To NoOfNodes
-            ListOfNodes.Add(Chr(65 + i))
+        Dim cycles As New List(Of String)
+        R(VariableNames(), cycles, "") 'FINDS ALL THE CYCLES
+        For Each cycle In cycles
+            Console.WriteLine(cycle)
         Next
-        'Cycles = RecursiveCombinatorics(ListOfNodes, Cycles, ListOfNodes.Count)
-        'Cycles.RemoveAll(Function(x) Len(x) <= 2)
+        Console.ReadLine()
 
-        'For Each stringthing In Cycles
-        '    Console.WriteLine(stringthing)
-        'Next
-        'Console.ReadLine()
+        Dim tableLength As Integer = NoOfEdges + 2
+        Dim tableHeight As Integer = cycles.Count + NoOfEdges + 2
+        ReDim UserInputTable(tableLength, tableHeight)
+
+        For y = 0 To tableHeight
+            For x = 0 To tableLength
+                If x = tableLength - 1 Then
+                    If y > cycles.Count Or y = 0 Then
+                        UserInputTable(x, y) = "L"
+                    Else
+                        UserInputTable(x, y) = "E"
+                    End If
+                ElseIf y = 0 Then
+
+                End If
+            Next
+        Next
 
     End Sub
+
+    Sub R(ByRef subgraph As List(Of String), ByRef cycles As List(Of String), currentpath As String) 'recursive subroutine which finds all the cycles
+
+        If currentpath = "" Then
+            currentpath = subgraph(0)
+        End If
+
+        Dim check As Boolean
+        For Each edge In subgraph
+            If Left(edge, 1) = Right(currentpath, 1) Then
+                check = True
+                For Each letter In currentpath
+                    If Right(edge, 1) = letter Then
+                        If letter = Left(currentpath, 1) And Len(currentpath) > 2 Then
+                            cycles.Add(currentpath & letter)
+                        End If
+                        check = False
+                    End If
+                Next
+                If check = True Then
+                    R(subgraph, cycles, currentpath & Right(edge, 1))
+                End If
+            ElseIf Right(edge, 1) = Right(currentpath, 1) Then
+                check = True
+                For Each letter In currentpath
+                    If Left(edge, 1) = letter Then
+                        If letter = Left(currentpath, 1) And Len(currentpath) > 2 Then
+                            cycles.Add(currentpath)
+                        End If
+                        check = False
+                    End If
+                Next
+                If check = True Then
+                    R(subgraph, cycles, currentpath & Left(edge, 1))
+                End If
+            End If
+        Next
+
+        If currentpath = subgraph(0) And subgraph.Count > 1 Then
+            subgraph.Remove(currentpath)
+            R(subgraph, cycles, "")
+        End If
+    End Sub
+
+
     Public Function GetMode() As Integer Implements IMenu.GetMode
         Return 3
     End Function
@@ -70,10 +101,14 @@ Public Class Tree
 
     Public Function VariableNames() As List(Of String) Implements IMenu.VariableNames
         Dim variables As New List(Of String)
+        Dim count As Integer = 0
         For i = 0 To NoOfNodes
             For j = 0 To NoOfNodes
                 If i < j Then
-                    variables.Add(Chr(65 + i) & Chr(65 + j))
+                    If ExistingConnections(count) <> 0 Then
+                        variables.Add(Chr(65 + i) & Chr(65 + j))
+                    End If
+                    count += 1
                 End If
             Next
         Next
