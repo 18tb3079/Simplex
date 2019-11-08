@@ -33,26 +33,54 @@ Public Class Tree
 
         For y = 0 To tableHeight
             For x = 0 To tableLength
-                If x = tableLength - 1 Then
-                    If y > cycles.Count Or y = 0 Then
+                If x = tableLength Then
+                    If y <> 1 Then
                         UserInputTable(x, y) = "L"
                     Else
                         UserInputTable(x, y) = "E"
                     End If
                 ElseIf y = 0 Then
+                    If x <> tableLength - 1 Then
+                        Do
+                            NextEdgeCount += 1
+                        Loop Until ExistingConnections(NextEdgeCount) <> 0
+                        UserInputTable(x, y) = ExistingConnections(NextEdgeCount)
+                    End If
+                ElseIf y = 1 Then
+                    If x <> tableLength - 1 Then
+                        UserInputTable(x, y) = 1
+                    Else
+                        UserInputTable(x, y) = NoOfNodes
+                    End If
+                ElseIf y < cycles.Count + 2 Then
+                    If x <> tableLength - 1 Then
 
+                        If cycles(y - 2).Contains(Edges(x)) Then
+                            UserInputTable(x, y) = 1
+                        ElseIf StrReverse(cycles(y - 2)).Contains(Edges(x)) Then
+                            UserInputTable(x, y) = 1
+                        Else
+                            UserInputTable(x, y) = 0
+                        End If
+                    Else
+                        UserInputTable(x, y) = Len(cycles(y - 2)) - 2
+                    End If
+                Else
+                    If x = y - 5 Or x = tableLength - 1 Then
+                        UserInputTable(x, y) = 1
+                    Else
+                        UserInputTable(x, y) = 0
+                    End If
                 End If
             Next
         Next
-
+        ReDim Preserve UserInputTable(tableLength, tableHeight + 1) 'This is to match the formatting of the tableau class
     End Sub
 
     Sub R(ByRef subgraph As List(Of String), ByRef cycles As List(Of String), currentpath As String) 'recursive subroutine which finds all the cycles
-
         If currentpath = "" Then
             currentpath = subgraph(0)
         End If
-
         Dim check As Boolean
         For Each edge In subgraph
             If Left(edge, 1) = Right(currentpath, 1) Then
@@ -73,7 +101,7 @@ Public Class Tree
                 For Each letter In currentpath
                     If Left(edge, 1) = letter Then
                         If letter = Left(currentpath, 1) And Len(currentpath) > 2 Then
-                            cycles.Add(currentpath)
+                            cycles.Add(currentpath & letter)
                         End If
                         check = False
                     End If

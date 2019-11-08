@@ -1,5 +1,4 @@
-﻿
-Module Module1
+﻿Module Module1
     Function OneDMenu(Questions As List(Of String), Instruction As String, Type As String) As List(Of Integer)
         If Type <> "Blank" And Instruction <> "" Then Questions.Add("Press enter here to continue")
         Dim NoOfQs As Integer = Questions.Count - 1
@@ -33,12 +32,20 @@ Module Module1
                         Console.SetCursorPosition(Len(Questions(Line) & Answers(Line)), Line + 1)
                         Console.Write("          ")
                         Line -= 1
+                    Else
+                        Console.SetCursorPosition(Len(Questions(Line) & Answers(Line)), Line + 1)
+                        Console.Write("          ")
+                        Line = NoOfQs
                     End If
                 Case ConsoleKey.DownArrow
                     If Line <> NoOfQs Then
                         Console.SetCursorPosition(Len(Questions(Line) & Answers(Line)), Line + 1)
                         Console.Write("          ")
                         Line += 1
+                    Else
+                        Console.SetCursorPosition(Len(Questions(Line) & Answers(Line)), Line + 1)
+                        Console.Write("          ")
+                        Line = 0
                     End If
                 Case ConsoleKey.Enter
                     If Type = "Blank" Then
@@ -84,55 +91,60 @@ Module Module1
         Console.ReadKey()
     End Function
 
+    Sub SideNote()
+
+    End Sub
+
     Sub Main()
-        Console.WriteLine("PLEASE GO FULLSCREEN (press enter to continue)")
+        Console.WriteLine("It is recommended to go full screen (press enter to continue)")
         Console.ReadLine()
         Console.CursorVisible = False
         Dim MyMenu As IMenu
         Dim choice As ConsoleKey = 0
         Dim OptimisationProblem As Integer
         Dim displaymode As Integer = 0
-        Do Until choice >= ConsoleKey.D4
+        Do
             Console.Clear()
             'Try
             Do
-                OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path", "Minimum Spanning Tree", "Settings"}), "Select Mode", "Blank")(0)
+                If choice <> 2 Then OptimisationProblem = OneDMenu(New List(Of String)({"Custom Constraints", "Maximal Matching", "Maximum Flow", "Shortest Path", "Minimum Spanning Tree", "Settings"}), "Select Mode", "Blank")(0)
                 If OptimisationProblem = 0 Then
-                    MyMenu = New SimplexMenu()
-                ElseIf OptimisationProblem = 1 Then
-                    MyMenu = New Matching()
-                ElseIf OptimisationProblem = 2 Then
-                    MyMenu = New Flow()
-                ElseIf OptimisationProblem = 3 Then
-                    MyMenu = New ShortestPath()
-                ElseIf OptimisationProblem = 4 Then
-                    MyMenu = New Tree()
-                ElseIf OptimisationProblem = 5 Then 'Settings
-                    displaymode = OneDMenu(New List(Of String)({"Display each iteration", "Display each step", "Display only the completed tableau"}), "Select Display Mode", "Blank")(0)
-                Else
-                    MyMenu = New SimplexMenu()
-                End If
-            Loop Until OptimisationProblem <> 4
+                        MyMenu = New SimplexMenu()
+                    ElseIf OptimisationProblem = 1 Then
+                        MyMenu = New Matching()
+                    ElseIf OptimisationProblem = 2 Then
+                        MyMenu = New Flow()
+                    ElseIf OptimisationProblem = 3 Then
+                        MyMenu = New ShortestPath()
+                    ElseIf OptimisationProblem = 4 Then
+                        MyMenu = New Tree()
+                    ElseIf OptimisationProblem = 5 Then 'Settings
+                        Console.CursorVisible = False
+                        displaymode = OneDMenu(New List(Of String)({"Display each iteration", "Display each step", "Display only the completed tableau"}), "Select Display Mode", "Blank")(0)
+                    Else
+                        MyMenu = New SimplexMenu()
+                    End If
+                Loop Until OptimisationProblem <> 5
 
-            Dim MyTableau As Tableau
-            Do
-                If MyMenu.GetMode = 1 Then
-                    MyTableau = New OneStep(MyMenu, displaymode)
-                ElseIf MyMenu.GetMode = 2 Then
-                    MyTableau = New TwoStep(MyMenu, displaymode)
-                Else ' mode = 3
-                    MyTableau = New MinimiseStep(MyMenu, displaymode)
-                End If
-                MyTableau.OutputConstraintsFromTableau()
-                MyTableau.Simplex()
-                Console.WriteLine(vbCrLf & "Please enter your next action")
-                Console.WriteLine("1. Run the simplex algorithm again with these constraints")
-                Console.WriteLine("2. Choose a different mode")
-                Console.WriteLine("3. Go back to the main menu")
-                Console.WriteLine("4. Exit")
-                While Console.KeyAvailable
-                    choice = Console.ReadKey(True).Key
-                End While
+                Dim MyTableau As Tableau
+                Do
+                    If MyMenu.GetMode = 1 Then
+                        MyTableau = New OneStep(MyMenu, displaymode)
+                    ElseIf MyMenu.GetMode = 2 Then
+                        MyTableau = New TwoStep(MyMenu, displaymode)
+                    Else ' mode = 3
+                        MyTableau = New MinimiseStep(MyMenu, displaymode)
+                    End If
+                    MyTableau.OutputConstraintsFromTableau()
+                    MyTableau.Simplex()
+                    Console.WriteLine(vbCrLf & "Please enter your next action")
+                    Console.WriteLine("1. Run the simplex algorithm again with these constraints")
+                    Console.WriteLine("2. Choose different constraints")
+                    Console.WriteLine("3. Go back to the main menu")
+                    Console.WriteLine("4. Exit")
+                    While Console.KeyAvailable
+                        choice = Console.ReadKey(True).Key
+                    End While
                 choice = Console.ReadKey(True).Key
             Loop Until choice >= ConsoleKey.D2
             ' Catch ex As Exception
@@ -141,11 +153,7 @@ Module Module1
             'Console.WriteLine("Press enter to restart: ")
             'Console.ReadLine()
             'End Try                                                                                                                                                                                                                                                                 
-        Loop
+        Loop Until choice >= ConsoleKey.D4
     End Sub
 
 End Module
-
-
-
-
