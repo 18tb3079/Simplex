@@ -91,8 +91,16 @@
         Console.ReadKey()
     End Function
 
-    Sub SideNote()
-
+    Sub SideNote(message As String, left As Integer, top As Integer)
+        Console.SetCursorPosition(60, 0)
+        For Each letter In message
+            If letter = "," Then
+                Console.SetCursorPosition(60, Console.CursorTop + 1)
+            Else
+                Console.Write(letter)
+            End If
+        Next
+        Console.SetCursorPosition(left, top)
     End Sub
 
     Sub Main()
